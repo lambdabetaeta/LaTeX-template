@@ -1,0 +1,57 @@
+name: Build and release PDF
+
+# Compile main.tex on every push to the default branch and publish the PDF to a
+# rolling "latest" GitHub Release. Each push adds a commit/date-stamped asset and
+# refreshes main-latest.pdf, so the latest build is always at a stable URL:
+#
+#   https://github.com/<owner>/<repo>/releases/latest/download/main-latest.pdf
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          # latexmk reads latexmkrc (default target, biber, shell-escape).
+          latexmk_shell_escape: true
+
+      - name: Stamp the PDF with commit and date
+        id: stamp
+        run: |
+          DATE="$(date -u +%Y-%m-%d)"
+          SHA="$(git rev-parse --short HEAD)"
+          STAMPED="main-${DATE}-${SHA}.pdf"
+          cp main.pdf "${STAMPED}"
+          cp main.pdf main-latest.pdf
+          echo "date=${DATE}"       >> "$GITHUB_OUTPUT"
+          echo "sha=${SHA}"         >> "$GITHUB_OUTPUT"
+          echo "stamped=${STAMPED}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to the rolling "latest" release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: Latest build
+          body: |
+            Automatically built from `${{ github.sha }}` on ${{ steps.stamp.outputs.date }}.
+
+            - `main-latest.pdf` — always the most recent build.
+            - `${{ steps.stamp.outputs.stamped }}` — this build, stamped by date and commit.
+          make_latest: true
+          files: |
+            main-latest.pdf
+            ${{ steps.stamp.outputs.stamped }}
