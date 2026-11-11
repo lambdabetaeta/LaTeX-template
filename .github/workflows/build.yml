@@ -26,8 +26,7 @@ jobs:
         uses: xu-cheng/latex-action@v4
         with:
           root_file: main.tex
-          # latexmk reads latexmkrc (default target, biber, shell-escape).
-          latexmk_shell_escape: true
+          # latexmk reads latexmkrc (default target, engine) and runs biber.
 
       - name: Stamp the PDF with commit and date
         id: stamp

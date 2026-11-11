@@ -1,3 +1,9 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{categories}[2026/11/11 Category theory]
+
+\RequirePackage{maths}
+\RequirePackage{mleftright}
+
 %% CATEGORICAL CONSTANTS
 \NewDocumentCommand{\SET}{}{\mathbf{Set}}
 \NewDocumentCommand{\CAT}{}{\mathbf{Cat}}
@@ -22,7 +28,12 @@
 \NewDocumentCommand{\Equiv}{}{\simeq}
 
 %% BASIC GADGETS: OBJECTS, MORPHISMS, ...
-\NewDocumentCommand{\IdArr}{g}{\id_{#1}}
+
+%% \Mor{A}{B}    produces A -> B
+%% \Mor[f]{A}{B} produces f : A -> B
+\NewDocumentCommand{\Mor}{omm}{\IfValueT{#1}{#1 \colon} #2 \to #3}
+\NewDocumentCommand{\IdArr}{g}{\id\IfValueT{#1}{_{#1}}}
+\NewDocumentCommand{\TermArr}{g}{{!}\IfValueT{#1}{_{#1}}}
 \NewDocumentCommand{\semi}{}{\mathbin{;}} % diagrammatic order
 \NewDocumentCommand{\Hom}{O{} m m}{\mathrm{Hom}_{#1}\DelimPrn{#2, #3}}
 \NewDocumentCommand{\Op}{m}{\DelimMin{2} {#1}^{\mathsf{op}}}
@@ -38,32 +49,27 @@
 \NewDocumentCommand{\SLICE}{mm}{#1 \mathbin{/} #2}
 
 %% Kan and Nerves and Reindexing and Grothendieck
-\NewDocumentCommand{\LKan}{smm}{\DelimMin{2}#2_{{!}}\IfBooleanTF{#1}{\DelimPrn{#3}}{#3}}
-\NewDocumentCommand{\RKan}{smm}{\DelimMin{2}#2_{{*}}\IfBooleanTF{#1}{\DelimPrn{#3}}{#3}}
-\NewDocumentCommand{\NerveS}{smm}{\DelimMin{2}{#2}^{{\star}}\IfBooleanTF{#1}{\DelimPrn{#3}}{#3}}
-\NewDocumentCommand{\Geom}{m}{\DelimVert{#1}}
+\NewDocumentCommand{\LKan}{smm}{\DelimMin{2}#2_{{!}}\OptPrn{#1}{#3}}
+\NewDocumentCommand{\RKan}{smm}{\DelimMin{2}#2_{{*}}\OptPrn{#1}{#3}}
+\NewDocumentCommand{\NerveS}{smm}{\DelimMin{2}{#2}^{{\star}}\OptPrn{#1}{#3}}
+\NewDocumentCommand{\Geom}{m}{\abs{#1}}
 \NewDocumentCommand{\Nerve}{m}{\mathcal{N}\DelimPrn{#1}}
-\NewDocumentCommand{\Pre}{smm}{#2^*\IfBooleanTF{#1}{\DelimPrn{#3}}{#3}}
-\NewDocumentCommand{\ReIdx}{smm}{\IfBooleanTF{#1}{\DelimPrn{#2}}{#2}^{-1}\DelimPrn{#3}}
+\NewDocumentCommand{\Pre}{smm}{#2^*\OptPrn{#1}{#3}}
+\NewDocumentCommand{\ReIdx}{smm}{\OptPrn{#1}{#2}^{-1}\DelimPrn{#3}}
 \NewDocumentCommand{\Groth}{O{\CC}m}{\esh_{#1} #2}
 
 %% TRANSPOSE
 \NewDocumentCommand{\Transp}{m}{\DelimMin{2} \widebar{#1}}
 
-
 %% YONEDA STUFF
 \NewDocumentCommand{\Yo}{g}{\mathbf{y}\IfValueT{#1}{\DelimPrn{#1}}}
 \NewDocumentCommand{\YoCov}{g}{\mathbf{h}\IfValueT{#1}{\DelimPrn{#1}}}
-\NewDocumentCommand\YoEm{G{-}}{
-  \mathchoice{%
-    \mleft\lfloor\mkern-2mu{#1}\mkern-2mu\mright\rfloor
-  }{%
-    \mleft\lfloor\mkern-2mu{#1}\mkern-2mu\mright\rfloor
-  }{%
-    \lfloor #1 \rfloor%
-  }{%
-    \lfloor #1 \rfloor%
-  }%
+\NewDocumentCommand{\YoEm}{G{-}}{%
+  \mathchoice
+    {\mleft\lfloor\mkern-2mu{#1}\mkern-2mu\mright\rfloor}%
+    {\mleft\lfloor\mkern-2mu{#1}\mkern-2mu\mright\rfloor}%
+    {\lfloor #1 \rfloor}%
+    {\lfloor #1 \rfloor}%
 }
 
 % presheaf-specific macros
@@ -75,15 +81,17 @@
 \NewDocumentCommand{\quiver}{}{\mathfrak{Q}}
 \NewDocumentCommand{\Act}{mm}{#1 \mathbin{\cdot} #2}
 
-
 %% PROFUNCTORIAL MACROS
-\NewDocumentCommand{\Prof}{oo}{\textbf{Prof}\IfValueTF{#1}{\DelimPrn{#1, #2}}}
-\NewDocumentCommand{\Cocont}{oo}{\textbf{Cocont}\IfValueTF{#1}{\DelimPrn{#1, #2}}}
+
+%% \Prof          produces Prof
+%% \Prof[\CC][\DD] produces Prof(C, D)
+\NewDocumentCommand{\Prof}{oo}{\textbf{Prof}\IfValueT{#1}{\DelimPrn{#1, #2}}}
+\NewDocumentCommand{\Cocont}{oo}{\textbf{Cocont}\IfValueT{#1}{\DelimPrn{#1, #2}}}
 \NewDocumentCommand{\pfto}{}{\relbar\joinrel\mapstochar\joinrel\rightarrow}
 \NewDocumentCommand{\ActForward}{smm}{%
-  #2 \mathbin{\rhd} \IfBooleanTF{#1}{\DelimMin{2} \DelimPrn{#3}}{#3} 
+  #2 \mathbin{\rhd} \IfBooleanTF{#1}{\DelimMin{2}\DelimPrn{#3}}{#3}%
 }
 \NewDocumentCommand{\ActBackward}{smm}{%
-  \IfBooleanTF{#1}{\DelimMin{2} \DelimPrn{#2}}{#2} \mathbin{\lhd} #3
+  \IfBooleanTF{#1}{\DelimMin{2}\DelimPrn{#2}}{#2} \mathbin{\lhd} #3%
 }
 \NewDocumentCommand{\ReprProf}{omO{-}O{-}}{\Hom[#1]{#3}{#2 #4}}

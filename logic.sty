@@ -1,19 +1,12 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{logic}[2026/11/11 Logic and Kripke semantics]
 
-\NewDocumentCommand{\Bool}{}{\mathbb{B}}
-\NewDocumentCommand{\BTrue}{}{\textbf{tt}}
-\NewDocumentCommand{\BFalse}{}{\textbf{ff}}
+\RequirePackage{maths}
 
 \NewDocumentCommand{\Props}{}{\mathcal{P}}
 \NewDocumentCommand{\True}{}{\top}
 \NewDocumentCommand{\False}{}{\bot}
 
 \NewDocumentCommand{\Kripke}{m}{\mathcal{#1}}
-\NewDocumentCommand{\Force}{mom}{%
-  #1 \Vdash_{\IfValueTF{#2}{#2}{}} #3
-}
-\NewDocumentCommand{\Valuation}{o}{\IfValueTF{#1}{V_{#1}}{V}}
-\NewDocumentCommand{\SetComp}{mm}{\DelimBetweenSurround{\lbrace}{\vert}{\rbrace}{#1}{#2}}
-\NewDocumentCommand{\Sem}{mo}{\DelimMin{2} \DelimBbrk{#1}_{\IfValueTF{#2}{#2}{}}}
-
-\NewDocumentCommand{\DeclVarL}{mm}{#1 : #2}
-\NewDocumentCommand{\Fn}{mmm}{\DelimPrn{\DeclVarL{#1}{#2}} \to #3}
+\NewDocumentCommand{\Force}{mom}{#1 \Vdash\IfValueT{#2}{_{#2}} #3}
+\NewDocumentCommand{\Valuation}{o}{V\IfValueT{#1}{_{#1}}}

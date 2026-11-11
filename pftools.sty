@@ -1,15 +1,13 @@
-\NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesPackage{pftools}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pftools}[2026/11/11 Hyperlinked inference rules and proof outlines]
 
-\@ifundefined{basedir}{%
-\RequirePackage{locallabel}
-}{%
-\RequirePackage{\basedir locallabel}
-}%
-
-\RequirePackage{Tabbing}	% Avoid the standard tabbing environment. Its \< conflicts with the semantic package.
-\RequirePackage{xparse}
+\RequirePackage{amsthm}
+\RequirePackage{mathpartir}
+\RequirePackage{hyperref}
 \RequirePackage{xcolor}
+\RequirePackage{jmsdelim}
+\RequirePackage{locallabel}
+\RequirePackage{Tabbing}    % Avoid the standard tabbing environment. Its \< conflicts with the semantic package.
 
 %% Biimplication inference rules
 % \biimp above below
@@ -88,14 +86,15 @@
 \colorlet{codecolor}{rgb:red,76;green,177;blue,36}
 
 \newcommand*\res[1]{{\color{rescolor}\ensuremath{#1}}}
-%When \left\{ … \right\} looks ugly, remember Dave says you want \bracket.
+% \RES{P}[x]  produces {P}_x, braces sized to fit.
+% \RES*{P}[x] typesets P as a left-aligned column, lines separated by \\.
 \NewDocumentCommand{\RES}{s m O{}}{%
-	\ensuremath{\displaystyle{{\left\{\res{%
-				\IfBooleanTF{#1}{\begin{inbox}[l]#2\end{inbox}}{#2}%
-			}\right\}}_{#3}}}}
+	\ensuremath{\displaystyle{\DelimBrc{\res{%
+		\IfBooleanTF{#1}{\begin{array}[t]{@{}l@{}}#2\end{array}}{#2}%
+	}}_{#3}}}}
 
 \NewDocumentCommand{\ARES}{m O{}}{%
-	${\displaystyle{\bracket\langle\rangle{\color{rescolor}{#1}}}_{#2}}$}
+	\ensuremath{\displaystyle{\DelimGl{\res{#1}}_{#2}}}}
 
 \newcommand*{\CODE}[1]{%
 	${\displaystyle{\color{codecolor}#1}}$}

@@ -1,26 +1,25 @@
-\usepackage{mleftright}
-\usepackage{ifthen}
-\usepackage{scalerel}
-\usepackage{epigraph}
-\usepackage{datetime}
-\usepackage{mathpartir}
-\usepackage{array}
-\usepackage{etoolbox}
-\usepackage{enumitem}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{preamble}[2026/11/11 Shared preamble: bibliography, links, lists, grammars]
+
+\RequirePackage{datetime}
+\RequirePackage{mathtools}
+\RequirePackage{mathpartir}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{xcolor}
+\RequirePackage{hyperref}
 
 % Biber - can be replaced if BibTeX is mandated
 
-\usepackage[
+\RequirePackage[
   backend=biber,
-  doi=true,
-  citestyle=alphabetic,
-  backref=true,
-  sortcites=true,
   style=alphabetic,
-  maxnames=1000,
-  mincrossrefs=99,
   sorting=nyt,
-  sortcites
+  sortcites=true,
+  doi=true,
+  backref=true,
+  maxnames=1000,
+  mincrossrefs=99
 ]{biblatex}
 
 %% Colours
@@ -68,7 +67,7 @@
 %%
 
 \newcommand\GrmContinue{\multicolumn{2}{l}{}} % for weird reasons this must be \newcommand
-  
+
 \NewDocumentEnvironment{grammar}{}{%
   \par\vspace{.5\baselineskip}
   \begin{tabular}{>{\itshape(}l<{)} >{$}l<{$} @{\quad $\Coloneqq$\quad } >{$}l<{$}}%
@@ -76,33 +75,3 @@
   \end{tabular}%
   \par\vspace{.5\baselineskip}
 }
-
-\makeatletter
-\def\rightharpoonupfill@{\arrowfill@\relbar\relbar\rightharpoonup}
-\newcommand{\overrightharpoonup}{\mathpalette{\overarrow@\rightharpoonupfill@}}
-\makeatother
-
-\NewDocumentCommand\JdgFrame{m}{%
-  \fbox{$\displaystyle #1$}
-}
-
-%% Defines a wider version of bar that isn't as large as overline.  The code is stolen from
-%% https://tex.stackexchange.com/questions/16337/can-i-get-a-widebar-without-using-the-mathabx-package/60253#60253
-\makeatletter
-\newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
-\newcommand*\widebar[1]{%
-  \begingroup
-  \def\mathaccent##1##2{%
-    \rel@kern{0.8}%
-    \overline{\rel@kern{-0.8}\macc@nucleus\rel@kern{0.2}}%
-    \rel@kern{-0.2}%
-  }%
-  \macc@depth\@ne
-  \let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
-  \mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
-  \macc@set@skewchar\relax
-  \let\mathaccentV\macc@nested@a
-  \macc@nested@a\relax111{#1}%
-  \endgroup
-}
-\makeatother

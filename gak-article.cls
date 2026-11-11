@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{gak-article}[2024/02/26 GAK Article Template]
+\ProvidesClass{gak-article}[2026/11/11 GAK Article Template]
 
 %% KOMA options
 \LoadClass{scrartcl}
@@ -11,16 +11,14 @@
 
 %% Font stuff
 
-\usepackage[T1]{fontenc}
-\usepackage{mlmodern}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{mlmodern}
 \renewcommand{\bfdefault}{b}
-% \usepackage[adobe-utopia]{mathdesign}
-\usepackage{microtype}
+% \RequirePackage[adobe-utopia]{mathdesign}
+\RequirePackage{microtype}
 
 %% Various nice packages 
 
-\RequirePackage{breakcites}
-\RequirePackage{xparse}
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{amsthm}
@@ -30,14 +28,30 @@
 \RequirePackage{fontawesome}
 \RequirePackage{jmsdelim}
 \RequirePackage{mathtools}
+\RequirePackage{tikz}
+
+% Since the 2024-11-01 kernel, \@addtoreset{ctr}{parent} also defines
+% \theHctr as \theHparent.\the\value{ctr}, and hyperref no longer patches it.
+% thmtools' aliasctr.sty overwrites \@addtoreset without that step, so a
+% theorem counter reset by section gets unqualified hyperref anchors, which
+% collide across sections. Restore it on top of aliasctr's version.
+\AddToHook{package/aliasctr/after}{%
+  \let\gak@aliasctr@addtoreset\@addtoreset
+  \renewcommand*\@addtoreset[2]{%
+    \gak@aliasctr@addtoreset{#1}{#2}%
+    \expandafter\xdef\csname theH#1\endcsname{%
+      \expandafter\noexpand\csname theH#2\endcsname.%
+      \noexpand\the\noexpand\value{#1}}%
+  }%
+}
 \RequirePackage{thmtools}
+
 \RequirePackage[pdfusetitle,hyperfootnotes=false]{hyperref}
 \RequirePackage[capitalize,nameinlink]{cleveref}
 
 %% Cleverref options
 
 \crefname{equation}{}{}
-\crefname{chapter}{\S\!\!}{\S\!\!}
 \crefname{section}{\S\!\!}{\S\!\!}
 % Create counter for diagrams
 \newcounter{diagram}

@@ -3,6 +3,7 @@
 \usepackage{preamble}
 \usepackage{pftools}
 \usepackage{lipsum}
+\usepackage{minted}
 \usepackage{maths}
 \usepackage{lambda-macros}
 \usepackage{macros}
@@ -107,6 +108,16 @@
 \section{Second}
 
 Recall that we proved \cref{theorem:induction} in \cref{section:first}.
+
+Code is typeset with \texttt{minted}:
+\begin{minted}{haskell}
+data Term = Var String | Lam String Term | App Term Term
+
+free :: Term -> [String]
+free (Var x)   = [x]
+free (Lam x m) = filter (/= x) (free m)
+free (App m n) = free m ++ free n
+\end{minted}
 
 \lipsum[4]
 

@@ -1,25 +1,10 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lambda-macros}[2026/11/11 Lambda calculi and type systems]
+
 %% Basic Lambda Calculus macros
-%% Alex Kavvos, 2021-2023
+%% Alex Kavvos, 2021-2026
 
-\ProvidesPackage{lambda-macros}[2023/01/28 lambda-macros]
-
-%% Load in your own work by putting in the same folder as your file and invoking
-%%
-%%   \usepackage{lambda-macros}
-%%
-
-%% We require Jon M. Sterling's delimiters package for nice parentheses.
-
-\RequirePackage{jmsdelim}
-
-%% THE FOLLOWING MACROS REQUIRE THE USE OF **xparse**
-%% I HIGHLY RECOMMEND YOU LEARN HOW TO USE IT
-%% IT IS ONE OF THE FEW PACKAGES THAT MAKE LaTeX MORE BEARABLE
-
-\RequirePackage{xparse}
-
-%% We also need this to make pretty colours
-
+\RequirePackage{maths}
 \RequirePackage{xcolor}
 
 \definecolor{IdiotPurple}{RGB}{102, 51, 102}
@@ -39,6 +24,8 @@
 \NewDocumentCommand{\Deriv}{m}{{\color{DogwoodRose}{#1}}}
 
 %% Judgements and Induction
+
+\NewDocumentCommand{\JdgFrame}{m}{\fbox{$\displaystyle #1$}}
 
 \NewDocumentCommand{\Zero}{}{\textsf{zero}}
 \NewDocumentCommand{\Succ}{m}{\textsf{succ}(#1)}
@@ -69,14 +56,14 @@
 \NewDocumentCommand{\Plus}{mm}{\textsf{plus}(#1; #2)}
 \NewDocumentCommand{\Times}{mm}{\textsf{times}(#1; #2)}
 \NewDocumentCommand{\ConcatA}{mm}{\textsf{cat}(#1; #2)}
-\NewDocumentCommand{\Concat}{mm}{#1 \mathbin{{+}\mspace{-8mu}{+}} #2}
+\NewDocumentCommand{\Concat}{mm}{#1 \ConcatOp #2}
 \NewDocumentCommand{\Length}{m}{\textsf{len}(#1)}
 \NewDocumentCommand{\LetA}{mmm}{\textsf{let}(#1; #2.\, #3)}
 \NewDocumentCommand{\Let}{mmm}{\textsf{let}\, #1 \Leftarrow #2\, \textsf{in}\, #3}
 
-\NewDocumentCommand{\Subst}{smmm}{
-  \DelimMin{2}
-  \IfBooleanTF{#1}{\DelimPrn{\Tm{#2}}}{\Tm{#2}}\Meta{\DelimBrk{\Tm{#3}/\Tm{#4}}}
+\NewDocumentCommand{\Subst}{smmm}{%
+  \DelimMin{2}%
+  \OptPrn{#1}{\Tm{#2}}\Meta{\DelimBrk{\Tm{#3}/\Tm{#4}}}%
 }
 
 %% Operational semantics
@@ -105,15 +92,13 @@
 
 %% \Lam{x}{e}    produces λx. e
 %% \Lam{x}[t]{e} produces λx : t. e
-\NewDocumentCommand{\Lam}{mom}{
-  \lambda 
-    \IfNoValueTF{#2}{#1}{\DeclVar{#1}{#2}}
-  .\, #3
+\NewDocumentCommand{\Lam}{mom}{%
+  \lambda \IfNoValueTF{#2}{#1}{\DeclVar{#1}{#2}}.\, #3%
 }
 
 %% \App{e}{e'}  produces e(e')
 %% \App*{e}{e'} produces (e)(e')
-\NewDocumentCommand{\App}{smm}{\IfBooleanTF{#1}{\DelimPrn{#2}}{#2}\DelimPrn{#3}}
+\NewDocumentCommand{\App}{smm}{\OptPrn{#1}{#2}\DelimPrn{#3}}
 
 %% Recursion
 
@@ -122,10 +107,9 @@
 \NewDocumentCommand{\IfThenElse}{mmm}{\textbf{if } #1 \textbf{ then } #2 \textbf{ else } #3}
 \NewDocumentCommand{\ParTo}{}{\rightharpoonup}
 \NewDocumentCommand{\Ifz}{mmmm}{\textsf{ifz}(#1; #2; #3.\, #4)}
-\NewDocumentCommand{\Fix}{mom}{
-  \textsf{fix}
-    \parens{
-      \IfNoValueTF{#2}{#1}{\DeclVar{#1}{#2}}
-      .\, #3
-    }
+
+%% \Fix{x}{e}    produces fix(x. e)
+%% \Fix{x}[t]{e} produces fix(x : t. e)
+\NewDocumentCommand{\Fix}{mom}{%
+  \textsf{fix}\DelimPrn{\IfNoValueTF{#2}{#1}{\DeclVar{#1}{#2}}.\, #3}%
 }

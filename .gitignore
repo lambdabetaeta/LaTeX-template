@@ -279,3 +279,6 @@ TSWLatexianTemp*
 
 # Ignore answers
 *-answers.tex
+
+# Local scratch
+.scratch/
