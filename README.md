@@ -8,8 +8,8 @@ With thanks to Daniel Gratzer and Jon Sterling for many of the macros.
 ## Requirements
 
 - A TeX distribution (TeX Live, MacTeX or MiKTeX) that includes `latexmk`
-  and `biber`, and whose LaTeX kernel is 2026-06-01 or newer. On TeX Live, run
-  `tlmgr update --self --all` to get it.
+  and `biber`, and whose LaTeX kernel is 2026-06-01 or newer. TeX Live 2026
+  (and MacTeX 2026) get it with `sudo tlmgr update --self --all`.
 - `latexminted` for `minted` code listings. TeX Live ships it and allows it
   under its default restricted shell escape, so `--shell-escape` is not needed.
 

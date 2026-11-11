@@ -1,5 +1,5 @@
 % The 2026-06-01 kernel gives sibling theorems their own alias counters, so
-% \cref names a lemma "Lemma" rather than "Theorem" without thmtools.
+% that a lemma is referred to as a lemma rather than a theorem.
 \NeedsTeXFormat{LaTeX2e}[2026-06-01]
 \ProvidesClass{gak-article}[2026/11/11 GAK Article Template]
 
@@ -33,35 +33,30 @@
 \RequirePackage{tikz}
 
 \RequirePackage[pdfusetitle,hyperfootnotes=false]{hyperref}
-\RequirePackage[capitalize,nameinlink]{cleveref}
+\RequirePackage{zref-clever}
 
-% cleveref predates the kernel's alias counters, which \newtheorem{lemma}[theorem]
-% now creates. Ask what resets an alias's root counter instead of the alias, so
-% that \cref sorts and compresses sibling theorems by section.
-\let\gak@cref@resetby\cref@resetby
-\def\cref@resetby#1{%
-  \edef\gak@ctr@root{\@kernel@get@ctr@root{#1}}%
-  \expandafter\gak@cref@resetby\expandafter{\gak@ctr@root}%
+%% Cross-references: \zcref{...}
+
+\zcsetup{cap, nameinlink=true}
+\zcRefTypeSetup{section}{
+  Name-sg = \S, name-sg = \S, Name-pl = \S, name-pl = \S, namesep = {},
+}
+\zcRefTypeSetup{equation}{
+  Name-sg = {}, name-sg = {}, Name-pl = {}, name-pl = {}, namesep = {},
 }
 
-%% Cleverref options
-
-\crefname{equation}{}{}
-\crefname{section}{\S\!\!}{\S\!\!}
-% Create counter for diagrams
-\newcounter{diagram}
-% Create diagram environment
+% A displayed, numbered TikZ picture, referred to as a diagram.
 \newenvironment{diagram}[1][]{%
     \begin{equation}%
+    \zcsetup{reftype = diagram}%
     \begin{tikzpicture}[#1, baseline=(current  bounding  box.center)]%
-    \setcounter{diagram}{\theequation}
-    \addtocounter{diagram}{-1}
-    \refstepcounter{diagram}
 }{%
     \end{tikzpicture}%
     \end{equation}%
 }
-\crefname{diagram}{Diagram}{Diagrams}
+\zcRefTypeSetup{diagram}{
+  Name-sg = Diagram, name-sg = diagram, Name-pl = Diagrams, name-pl = diagrams,
+}
 
 %% Make description and labelling environments nicer
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
@@ -72,32 +67,41 @@
 
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{conjecture}[theorem]{Conjecture}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{rul}[theorem]{Rule}
+\zcRefTypeSetup{theorem}{Name-sg = Theorem, Name-pl = Theorems}
 
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{notation}[theorem]{Notation}
-\newtheorem{construction}[theorem]{Construction}
+% \gak@newsibling{env}{Name}{Names} declares a theorem-like environment numbered
+% with theorem. Its counter is a kernel alias of theorem's, which zref-clever
+% does not know to be reset by section.
+\NewDocumentCommand{\gak@newsibling}{mmm}{%
+  \newtheorem{#1}[theorem]{#2}%
+  \zcsetup{counterresetby = {#1 = section}}%
+  \zcRefTypeSetup{#1}{Name-sg = #2, Name-pl = #3}%
+}
+
+\gak@newsibling{lemma}{Lemma}{Lemmas}
+\gak@newsibling{conjecture}{Conjecture}{Conjectures}
+\gak@newsibling{proposition}{Proposition}{Propositions}
+\gak@newsibling{corollary}{Corollary}{Corollaries}
+\gak@newsibling{rul}{Rule}{Rules}
+
+\gak@newsibling{definition}{Definition}{Definitions}
+\gak@newsibling{notation}{Notation}{Notations}
+\gak@newsibling{construction}{Construction}{Constructions}
 
 %% With longer examples and remarks, it's nice to have an end clearly defined, particularly when
 %% there's a page break involved.
-\newtheorem{examplex}[theorem]{Example}
+\gak@newsibling{examplex}{Example}{Examples}
 \newenvironment{example}
   {\pushQED{\qed}\renewcommand{\qedsymbol}{$\lhd$}\examplex}
   {\popQED\endexamplex}
-\newtheorem{remarkx}[theorem]{Remark}
+\gak@newsibling{remarkx}{Remark}{Remarks}
 \newenvironment{remark}
   {\pushQED{\qed}\renewcommand{\qedsymbol}{$\lhd$}\remarkx}
   {\popQED\endremarkx}
-\crefname{examplex}{Example}{Examples}
-\crefname{remarkx}{Remark}{Remarks}
 
 \theoremstyle{remark}
-\newtheorem{assumption}[theorem]{Assumption}
-\newtheorem{convention}[theorem]{Convention}
+\gak@newsibling{assumption}{Assumption}{Assumptions}
+\gak@newsibling{convention}{Convention}{Conventions}
 
 
 %% From https://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
