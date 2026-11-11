@@ -1,4 +1,6 @@
-\NeedsTeXFormat{LaTeX2e}
+% The 2026-06-01 kernel gives sibling theorems their own alias counters, so
+% \cref names a lemma "Lemma" rather than "Theorem" without thmtools.
+\NeedsTeXFormat{LaTeX2e}[2026-06-01]
 \ProvidesClass{gak-article}[2026/11/11 GAK Article Template]
 
 %% KOMA options
@@ -30,24 +32,17 @@
 \RequirePackage{mathtools}
 \RequirePackage{tikz}
 
-% Since the 2024-11-01 kernel, \@addtoreset{ctr}{parent} also defines
-% \theHctr as \theHparent.\the\value{ctr}, and hyperref no longer patches it.
-% thmtools' aliasctr.sty overwrites \@addtoreset without that step, so a
-% theorem counter reset by section gets unqualified hyperref anchors, which
-% collide across sections. Restore it on top of aliasctr's version.
-\AddToHook{package/aliasctr/after}{%
-  \let\gak@aliasctr@addtoreset\@addtoreset
-  \renewcommand*\@addtoreset[2]{%
-    \gak@aliasctr@addtoreset{#1}{#2}%
-    \expandafter\xdef\csname theH#1\endcsname{%
-      \expandafter\noexpand\csname theH#2\endcsname.%
-      \noexpand\the\noexpand\value{#1}}%
-  }%
-}
-\RequirePackage{thmtools}
-
 \RequirePackage[pdfusetitle,hyperfootnotes=false]{hyperref}
 \RequirePackage[capitalize,nameinlink]{cleveref}
+
+% cleveref predates the kernel's alias counters, which \newtheorem{lemma}[theorem]
+% now creates. Ask what resets an alias's root counter instead of the alias, so
+% that \cref sorts and compresses sibling theorems by section.
+\let\gak@cref@resetby\cref@resetby
+\def\cref@resetby#1{%
+  \edef\gak@ctr@root{\@kernel@get@ctr@root{#1}}%
+  \expandafter\gak@cref@resetby\expandafter{\gak@ctr@root}%
+}
 
 %% Cleverref options
 
@@ -97,6 +92,8 @@
 \newenvironment{remark}
   {\pushQED{\qed}\renewcommand{\qedsymbol}{$\lhd$}\remarkx}
   {\popQED\endremarkx}
+\crefname{examplex}{Example}{Examples}
+\crefname{remarkx}{Remark}{Remarks}
 
 \theoremstyle{remark}
 \newtheorem{assumption}[theorem]{Assumption}
