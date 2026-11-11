@@ -65,16 +65,19 @@
 
 %% AMS Theorem options
 
+% Theorems are numbered within this counter.
+\newcommand*{\gak@theoremwithin}{section}
+
 \theoremstyle{definition}
-\newtheorem{theorem}{Theorem}[section]
+\newtheorem{theorem}{Theorem}[\gak@theoremwithin]
 \zcRefTypeSetup{theorem}{Name-sg = Theorem, Name-pl = Theorems}
 
 % \gak@newsibling{env}{Name}{Names} declares a theorem-like environment numbered
 % with theorem. Its counter is a kernel alias of theorem's, which zref-clever
-% does not know to be reset by section.
+% does not know to be reset with theorem's.
 \NewDocumentCommand{\gak@newsibling}{mmm}{%
   \newtheorem{#1}[theorem]{#2}%
-  \zcsetup{counterresetby = {#1 = section}}%
+  \zcsetup{counterresetby = {#1 = \gak@theoremwithin}}%
   \zcRefTypeSetup{#1}{Name-sg = #2, Name-pl = #3}%
 }
 
